@@ -2,6 +2,7 @@
 
 require "devise"
 require "devise/strategies/authenticatable"
+require "devise/passwordless/login_token"
 
 module Devise
   module Strategies
