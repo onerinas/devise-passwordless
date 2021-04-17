@@ -21,22 +21,11 @@ module Devise
 
       def authenticate!
         begin
+          resource = User.find_signed self.token, purpose: :magic_link_login
           data = Devise::Passwordless::LoginToken.decode(self.token)
         rescue Devise::Passwordless::LoginToken::InvalidOrExpiredTokenError
           fail!(:magic_link_invalid)
           return
-        end
-
-        resource = mapping.to.find_by(id: data["data"]["resource"]["key"])
-
-        if resource && Devise.passwordless_expire_old_tokens_on_sign_in
-          if (last_login = resource.try(:current_sign_in_at))
-            token_created_at = ActiveSupport::TimeZone["UTC"].at(data["created_at"])
-            if token_created_at < last_login
-              fail!(:magic_link_invalid)
-              return
-            end
-          end
         end
 
         if validate(resource)
