@@ -21,30 +21,19 @@ module Devise
 
       def authenticate!
         begin
-          resource = User.find_signed self.token, purpose: :magic_link_login
+          resource = User.find_signed params[:user][:token], purpose: :magic_link_login
         rescue Devise::Passwordless::LoginToken::InvalidOrExpiredTokenError
           fail!(:magic_link_invalid)
           return
         end
 
-        if validate(resource)
+        if resource
           remember_me(resource)
           resource.after_magic_link_authentication
           success!(resource)
         else
           fail!(:magic_link_invalid)
         end
-      end
-
-      private
-
-      # Sets the authentication hash and the token from params_auth_hash or http_auth_hash.
-      def with_authentication_hash(auth_type, auth_values)
-        self.authentication_hash, self.authentication_type = {}, auth_type
-        self.token = auth_values[:token]
-
-        parse_authentication_key_values(auth_values, authentication_keys) &&
-        parse_authentication_key_values(request_values, request_keys)
       end
     end
   end
