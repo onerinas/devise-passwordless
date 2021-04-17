@@ -22,7 +22,6 @@ module Devise
       def authenticate!
         begin
           resource = User.find_signed self.token, purpose: :magic_link_login
-          data = Devise::Passwordless::LoginToken.decode(self.token)
         rescue Devise::Passwordless::LoginToken::InvalidOrExpiredTokenError
           fail!(:magic_link_invalid)
           return
