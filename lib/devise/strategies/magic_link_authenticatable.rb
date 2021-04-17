@@ -2,23 +2,10 @@
 
 require "devise"
 require "devise/strategies/authenticatable"
-require "devise/passwordless/login_token"
 
 module Devise
   module Strategies
     class MagicLinkAuthenticatable < Authenticatable
-      #undef :password
-      #undef :password=
-      attr_accessor :token
-
-      def valid_for_http_auth?
-        super && http_auth_hash[:token].present?
-      end
-
-      def valid_for_params_auth?
-        super && params_auth_hash[:token].present?
-      end
-
       def authenticate!
         begin
           resource = User.find_signed params[:user][:token], purpose: :magic_link_login
